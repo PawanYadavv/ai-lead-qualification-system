@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Lead System - Test Dashboard</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:wght@500;700&display=swap");
+
+      :root {
+        --bg: #fbf7ef;
+        --surface: #fffaf2;
+        --ink: #152238;
+        --ink-soft: #4a5b76;
+        --line: #d4c7b2;
+        --brand: #bd4f2c;
+        --brand-2: #0a7f79;
+        --ok: #1f8a4c;
+        --warn: #c8641c;
+        --err: #b63232;
+        --shadow: 0 20px 45px rgba(21, 34, 56, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+        background:
+          radial-gradient(circle at 10% 10%, rgba(189, 79, 44, 0.22), transparent 40%),
+          radial-gradient(circle at 85% 15%, rgba(10, 127, 121, 0.18), transparent 38%),
+          radial-gradient(circle at 90% 90%, rgba(24, 94, 151, 0.12), transparent 30%),
+          var(--bg);
+        min-height: 100vh;
+      }
+
+      .shell {
+        max-width: 1150px;
+        margin: 0 auto;
+        padding: 30px 18px 60px;
+      }
+
+      .hero {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: linear-gradient(135deg, rgba(255, 250, 242, 0.95), rgba(247, 242, 232, 0.95));
+        box-shadow: var(--shadow);
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: rgba(189, 79, 44, 0.12);
+        right: -40px;
+        top: -30px;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+      }
+
+      .hero p {
+        margin: 8px 0 0;
+        color: var(--ink-soft);
+        max-width: 780px;
+        line-height: 1.5;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 10px 24px rgba(21, 34, 56, 0.08);
+      }
+
+      .span-4 {
+        grid-column: span 4;
+      }
+
+      .span-6 {
+        grid-column: span 6;
+      }
+
+      .span-8 {
+        grid-column: span 8;
+      }
+
+      .span-12 {
+        grid-column: span 12;
+      }
+
+      .card h2 {
+        margin: 0 0 12px;
+        font-size: 1rem;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+
+      label {
+        display: block;
+        font-size: 0.82rem;
+        color: var(--ink-soft);
+        margin-bottom: 5px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid #c6bcae;
+        border-radius: 10px;
+        background: #fffcf7;
+        padding: 10px 11px;
+        font: inherit;
+        color: var(--ink);
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .btn-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 9px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 11px;
+        padding: 10px 12px;
+        color: #fff;
+        background: linear-gradient(135deg, #1f3658, #152238);
+        font-family: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 120ms ease, opacity 120ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-brand {
+        background: linear-gradient(135deg, var(--brand), #9a3517);
+      }
+
+      .btn-teal {
+        background: linear-gradient(135deg, var(--brand-2), #06625d);
+      }
+
+      .tokens {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        border: 1px solid #cbbfae;
+        background: #fffdf8;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      .err {
+        color: var(--err);
+      }
+
+      .log {
+        border: 1px solid #cad3df;
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 13px;
+        padding: 12px;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        min-height: 280px;
+        max-height: 460px;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+
+      .tiny {
+        font-size: 0.78rem;
+        color: var(--ink-soft);
+      }
+
+      .top-actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 980px) {
+        .span-4,
+        .span-6,
+        .span-8 {
+          grid-column: span 12;
+        }
+
+        .btn-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 560px) {
+        .row,
+        .btn-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <h1>AI Lead Qualification - One Click Test Dashboard</h1>
+        <p>
+          Is page se bina terminal ke API test karo: register, login, chatbot flow, leads, analytics, notifications.
+          Default setup local Docker ke liye prefilled hai.
+        </p>
+        <div class="top-actions">
+          <button id="run-all" class="btn-brand">Run Full Test</button>
+          <button id="clear-log">Clear Logs</button>
+          <button id="open-docs" class="btn-teal">Open Swagger Docs</button>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card span-6">
+          <h2>API Config</h2>
+          <label for="base-url">Base API URL</label>
+          <input id="base-url" value="http://localhost:8001/api/v1" />
+          <p class="tiny">Tip: hosted dashboard par default auto-adjust hota hai based on current origin.</p>
+        </article>
+
+        <article class="card span-6">
+          <h2>Identity Status</h2>
+          <div class="tokens">
+            <span class="chip" id="chip-token">Access token: missing</span>
+            <span class="chip" id="chip-tenant">Tenant token: missing</span>
+            <span class="chip" id="chip-session">Session: missing</span>
+          </div>
+          <p class="tiny" id="active-email">Active email: none</p>
+        </article>
+
+        <article class="card span-8">
+          <h2>Tenant / Auth Input</h2>
+          <div class="row">
+            <div>
+              <label for="business-name">Business name</label>
+              <input id="business-name" value="Demo Business" />
+            </div>
+            <div>
+              <label for="full-name">Owner name</label>
+              <input id="full-name" value="Demo Owner" />
+            </div>
+          </div>
+          <div class="row" style="margin-top: 10px">
+            <div>
+              <label for="email">Email</label>
+              <input id="email" value="owner.dashboard@example.com" />
+            </div>
+            <div>
+              <label for="password">Password</label>
+              <input id="password" type="password" value="StrongPass123" />
+            </div>
+          </div>
+          <div class="row" style="margin-top: 10px">
+            <div>
+              <label for="notification-email">Notification email</label>
+              <input id="notification-email" value="owner.dashboard@example.com" />
+            </div>
+            <div>
+              <label for="tenant-token">Tenant token (optional manual)</label>
+              <input id="tenant-token" placeholder="Auto-filled after register" />
+            </div>
+          </div>
+          <label style="margin-top: 10px; display: flex; align-items: center; gap: 8px">
+            <input id="auto-email" type="checkbox" checked style="width: auto" />
+            Auto-generate unique email on Register (recommended)
+          </label>
+        </article>
+
+        <article class="card span-4">
+          <h2>Chat Message</h2>
+          <textarea id="visitor-message">Hi, I am Alex. My email is alex@example.com and phone is +1 555 888 9999. Budget is around 20k, timeline is this month, and we need help with lead automation setup.</textarea>
+          <p class="tiny">Message me contact + budget + timeline dene se score jaldi aata hai.</p>
+        </article>
+
+        <article class="card span-12">
+          <h2>Endpoint Buttons</h2>
+          <div class="btn-grid">
+            <button id="btn-health">Health</button>
+            <button id="btn-register" class="btn-brand">Register</button>
+            <button id="btn-login">Login</button>
+            <button id="btn-start-session">Start Session</button>
+            <button id="btn-send-message" class="btn-teal">Send Message</button>
+            <button id="btn-leads">Get Leads</button>
+            <button id="btn-conversations">Get Conversations</button>
+            <button id="btn-analytics">Get Analytics</button>
+            <button id="btn-notifications">Get Notifications</button>
+          </div>
+        </article>
+
+        <article class="card span-12">
+          <h2>Logs</h2>
+          <div class="log" id="log-box">Dashboard ready. Click "Run Full Test" to begin.</div>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      const STORAGE_KEYS = {
+        baseUrl: "lead_test_base_url",
+        accessToken: "lead_test_access_token",
+        tenantToken: "lead_test_tenant_token",
+        activeEmail: "lead_test_active_email",
+      };
+
+      const state = {
+        baseUrl: "",
+        accessToken: "",
+        tenantToken: "",
+        sessionId: "",
+        activeEmail: "",
+        busy: false,
+      };
+
+      const refs = {
+        baseUrl: document.getElementById("base-url"),
+        businessName: document.getElementById("business-name"),
+        fullName: document.getElementById("full-name"),
+        email: document.getElementById("email"),
+        password: document.getElementById("password"),
+        notificationEmail: document.getElementById("notification-email"),
+        tenantToken: document.getElementById("tenant-token"),
+        autoEmail: document.getElementById("auto-email"),
+        visitorMessage: document.getElementById("visitor-message"),
+        logBox: document.getElementById("log-box"),
+        chipToken: document.getElementById("chip-token"),
+        chipTenant: document.getElementById("chip-tenant"),
+        chipSession: document.getElementById("chip-session"),
+        activeEmail: document.getElementById("active-email"),
+      };
+
+      function defaultBaseUrl() {
+        if (window.location.origin && window.location.origin.startsWith("http")) {
+          return window.location.origin + "/api/v1";
+        }
+        return "http://localhost:8001/api/v1";
+      }
+
+      function init() {
+        const savedBase = localStorage.getItem(STORAGE_KEYS.baseUrl);
+        const savedToken = localStorage.getItem(STORAGE_KEYS.accessToken);
+        const savedTenantToken = localStorage.getItem(STORAGE_KEYS.tenantToken);
+        const savedEmail = localStorage.getItem(STORAGE_KEYS.activeEmail);
+
+        refs.baseUrl.value = savedBase || defaultBaseUrl();
+        state.accessToken = savedToken || "";
+        state.tenantToken = savedTenantToken || "";
+        state.activeEmail = savedEmail || "";
+
+        if (savedEmail) {
+          refs.email.value = savedEmail;
+          refs.notificationEmail.value = savedEmail;
+        }
+
+        refs.notificationEmail.value = refs.email.value;
+        syncFromInputs();
+        updateChips();
+      }
+
+      function syncFromInputs() {
+        state.baseUrl = refs.baseUrl.value.trim().replace(/\/+$/, "");
+        state.tenantToken = refs.tenantToken.value.trim() || state.tenantToken;
+      }
+
+      function saveBaseUrl() {
+        localStorage.setItem(STORAGE_KEYS.baseUrl, refs.baseUrl.value.trim());
+      }
+
+      function persistIdentity() {
+        if (state.accessToken) {
+          localStorage.setItem(STORAGE_KEYS.accessToken, state.accessToken);
+        }
+        if (state.tenantToken) {
+          localStorage.setItem(STORAGE_KEYS.tenantToken, state.tenantToken);
+        }
+        if (state.activeEmail) {
+          localStorage.setItem(STORAGE_KEYS.activeEmail, state.activeEmail);
+        }
+      }
+
+      function colorClass(level) {
+        if (level === "ok") return "ok";
+        if (level === "warn") return "warn";
+        if (level === "err") return "err";
+        return "";
+      }
+
+      function logLine(message, data, level = "info") {
+        const timestamp = new Date().toLocaleTimeString();
+        const suffix = data === undefined ? "" : "\n" + JSON.stringify(data, null, 2);
+        refs.logBox.innerHTML += `\n<span class="${colorClass(level)}">[${timestamp}] ${message}</span>${suffix}\n`;
+        refs.logBox.scrollTop = refs.logBox.scrollHeight;
+      }
+
+      function clearLogs() {
+        refs.logBox.textContent = "Logs cleared.";
+      }
+
+      function shortToken(token) {
+        if (!token) return "missing";
+        return token.slice(0, 12) + "...";
+      }
+
+      function updateChips() {
+        refs.chipToken.textContent = "Access token: " + shortToken(state.accessToken);
+        refs.chipTenant.textContent = "Tenant token: " + shortToken(state.tenantToken);
+        refs.chipSession.textContent = "Session: " + (state.sessionId ? state.sessionId.slice(0, 12) + "..." : "missing");
+        refs.activeEmail.textContent = "Active email: " + (state.activeEmail || "none");
+        refs.tenantToken.value = state.tenantToken;
+        persistIdentity();
+      }
+
+      async function ensureAuthenticated() {
+        if (state.accessToken) {
+          return;
+        }
+
+        if (!refs.email.value.trim() || !refs.password.value) {
+          throw new Error("Login required: enter email/password and click Login once.");
+        }
+
+        logLine("Access token missing, attempting auto-login...");
+        try {
+          await loginUser();
+          return;
+        } catch (loginError) {
+          const message = String(loginError?.message || "");
+          const isInvalidCredentials = message.includes("/auth/login") && message.includes("(401)");
+
+          if (!isInvalidCredentials) {
+            throw loginError;
+          }
+
+          logLine("Auto-login failed (401). Trying auto-register fallback...", undefined, "warn");
+
+          try {
+            await registerUser();
+            return;
+          } catch (registerError) {
+            throw new Error(
+              "Auto-login failed and auto-register also failed. Please click Register/Login manually. " +
+                String(registerError?.message || registerError)
+            );
+          }
+        }
+      }
+
+      async function callApi(path, method = "GET", body = null, auth = false) {
+        syncFromInputs();
+        saveBaseUrl();
+
+        const headers = { Accept: "application/json" };
+        if (body !== null) {
+          headers["Content-Type"] = "application/json";
+        }
+        if (auth) {
+          if (!state.accessToken) {
+            throw new Error("Login required: access token missing.");
+          }
+          headers.Authorization = "Bearer " + state.accessToken;
+        }
+
+        const response = await fetch(state.baseUrl + path, {
+          method,
+          headers,
+          body: body !== null ? JSON.stringify(body) : undefined,
+        });
+
+        const text = await response.text();
+        let payload = text;
+        try {
+          payload = text ? JSON.parse(text) : null;
+        } catch (_) {
+          payload = text;
+        }
+
+        if (!response.ok) {
+          throw new Error(`${method} ${path} failed (${response.status}): ${typeof payload === "string" ? payload : JSON.stringify(payload)}`);
+        }
+
+        return payload;
+      }
+
+      function generateUniqueEmail(baseEmail) {
+        const stamp = Date.now();
+        if (baseEmail.includes("@")) {
+          const parts = baseEmail.split("@");
+          return `${parts[0]}.${stamp}@${parts[1]}`;
+        }
+        return `owner.${stamp}@example.com`;
+      }
+
+      async function healthCheck() {
+        const root = state.baseUrl.endsWith("/api/v1") ? state.baseUrl.slice(0, -7) : state.baseUrl;
+        const response = await fetch(root + "/health", { headers: { Accept: "application/json" } });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error("Health failed: " + JSON.stringify(payload));
+        }
+        logLine("Health check passed", payload, "ok");
+        return payload;
+      }
+
+      async function registerUser() {
+        let email = refs.email.value.trim();
+        if (refs.autoEmail.checked) {
+          email = generateUniqueEmail(email || "owner.dashboard@example.com");
+          refs.email.value = email;
+          refs.notificationEmail.value = email;
+        }
+
+        const payload = {
+          business_name: refs.businessName.value.trim(),
+          full_name: refs.fullName.value.trim(),
+          email,
+          password: refs.password.value,
+          notification_email: refs.notificationEmail.value.trim() || email,
+        };
+
+        const data = await callApi("/auth/register", "POST", payload, false);
+        state.accessToken = data.access_token || "";
+        state.tenantToken = data.tenant?.widget_token || "";
+        state.activeEmail = email;
+        updateChips();
+        logLine("Register successful", data, "ok");
+        return data;
+      }
+
+      async function loginUser() {
+        const payload = {
+          email: refs.email.value.trim(),
+          password: refs.password.value,
+        };
+
+        const data = await callApi("/auth/login", "POST", payload, false);
+        state.accessToken = data.access_token || "";
+        state.tenantToken = state.tenantToken || data.tenant?.widget_token || "";
+        state.activeEmail = payload.email;
+        updateChips();
+        logLine("Login successful", data, "ok");
+        return data;
+      }
+
+      async function startSession() {
+        syncFromInputs();
+        if (!state.tenantToken) {
+          throw new Error("Tenant token missing. Register or login first.");
+        }
+
+        const data = await callApi("/chatbot/session/start", "POST", { tenant_token: state.tenantToken }, false);
+        state.sessionId = data.session_id || "";
+        updateChips();
+        logLine("Session started", data, "ok");
+        return data;
+      }
+
+      async function sendMessage() {
+        syncFromInputs();
+        if (!state.sessionId) {
+          throw new Error("Session missing. Start session first.");
+        }
+        if (!state.tenantToken) {
+          throw new Error("Tenant token missing.");
+        }
+
+        const payload = {
+          tenant_token: state.tenantToken,
+          message: refs.visitorMessage.value.trim(),
+        };
+
+        const data = await callApi(`/chatbot/session/${state.sessionId}/message`, "POST", payload, false);
+        logLine("Chat message sent", data, "ok");
+        return data;
+      }
+
+      async function getLeads() {
+        await ensureAuthenticated();
+        const data = await callApi("/leads", "GET", null, true);
+        logLine(`Leads fetched (${data.length})`, data, "ok");
+        return data;
+      }
+
+      async function getConversations() {
+        await ensureAuthenticated();
+        const data = await callApi("/conversations", "GET", null, true);
+        logLine(`Conversations fetched (${data.length})`, data, "ok");
+        return data;
+      }
+
+      async function getAnalytics() {
+        await ensureAuthenticated();
+        const data = await callApi("/analytics", "GET", null, true);
+        logLine("Analytics fetched", data, "ok");
+        return data;
+      }
+
+      async function getNotifications() {
+        await ensureAuthenticated();
+        const data = await callApi("/notifications", "GET", null, true);
+        logLine(`Notifications fetched (${data.length})`, data, "ok");
+        return data;
+      }
+
+      function setBusy(value) {
+        state.busy = value;
+        const buttons = document.querySelectorAll("button");
+        buttons.forEach((button) => {
+          if (button.id !== "clear-log") {
+            button.disabled = value;
+          }
+        });
+      }
+
+      async function guarded(action, label) {
+        try {
+          setBusy(true);
+          logLine(`Running: ${label}`);
+          await action();
+        } catch (error) {
+          logLine(`${label} failed: ${error.message}`, undefined, "err");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function runFullFlow() {
+        try {
+          setBusy(true);
+          logLine("Full test started");
+          await healthCheck();
+          await registerUser();
+          await loginUser();
+          await startSession();
+          await sendMessage();
+          await getLeads();
+          await getConversations();
+          await getAnalytics();
+          await getNotifications();
+          logLine("Full test completed successfully", undefined, "ok");
+        } catch (error) {
+          logLine("Full test failed: " + error.message, undefined, "err");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      document.getElementById("btn-health").addEventListener("click", () => guarded(healthCheck, "Health check"));
+      document.getElementById("btn-register").addEventListener("click", () => guarded(registerUser, "Register"));
+      document.getElementById("btn-login").addEventListener("click", () => guarded(loginUser, "Login"));
+      document.getElementById("btn-start-session").addEventListener("click", () => guarded(startSession, "Start session"));
+      document.getElementById("btn-send-message").addEventListener("click", () => guarded(sendMessage, "Send message"));
+      document.getElementById("btn-leads").addEventListener("click", () => guarded(getLeads, "Get leads"));
+      document.getElementById("btn-conversations").addEventListener("click", () => guarded(getConversations, "Get conversations"));
+      document.getElementById("btn-analytics").addEventListener("click", () => guarded(getAnalytics, "Get analytics"));
+      document.getElementById("btn-notifications").addEventListener("click", () => guarded(getNotifications, "Get notifications"));
+      document.getElementById("run-all").addEventListener("click", runFullFlow);
+      document.getElementById("clear-log").addEventListener("click", clearLogs);
+      document.getElementById("open-docs").addEventListener("click", () => {
+        const root = refs.baseUrl.value.trim().replace(/\/+$/, "").replace(/\/api\/v1$/, "");
+        window.open(root + "/docs", "_blank");
+      });
+
+      init();
+    </script>
+  </body>
+</html>
+

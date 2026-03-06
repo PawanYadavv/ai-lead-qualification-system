@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Lead Qualification System - Landing Page</title>
+    <meta
+      name="description"
+      content="Convert website visitors into qualified leads automatically with AI chat, scoring, analytics, and instant alerts."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Syne:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a" aria-hidden="true"></div>
+    <div class="bg-orb orb-b" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <header class="topbar reveal delay-1">
+      <a class="brand" href="#">AI Lead Qualification System</a>
+      <a class="btn btn-ghost" href="#book-demo">Book a Demo</a>
+    </header>
+
+    <main>
+      <section class="hero reveal delay-2">
+        <p class="eyebrow">AI SALES AUTOMATION</p>
+        <h1>Convert Website Visitors Into Qualified Leads Automatically</h1>
+        <p class="subtext">
+          An AI assistant that chats with visitors, captures their requirements, and sends qualified leads directly to your
+          sales team.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#book-demo">Book a Demo</a>
+          <a class="btn btn-outline" href="#demo">View Live Demo</a>
+        </div>
+      </section>
+
+      <section id="features" class="section reveal delay-3">
+        <div class="section-head">
+          <p class="kicker">Features</p>
+          <h2>Everything You Need To Qualify Leads At Scale</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3>Instant AI chat with visitors</h3>
+            <p>Engage every visitor in real time without waiting for a sales rep.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Automatic lead qualification</h3>
+            <p>Collect name, email, phone, budget, timeline, and requirement naturally in conversation.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Lead scoring</h3>
+            <p>Prioritize opportunities using score-based qualification logic.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Dashboard analytics</h3>
+            <p>Track lead quality, conversation volume, and conversion health from one place.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Email alerts for high-value prospects</h3>
+            <p>Get notified instantly when a lead crosses your qualification threshold.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="demo" class="section demo reveal delay-4">
+        <div class="section-head">
+          <p class="kicker">Demo</p>
+          <h2>Live Widget Demo</h2>
+        </div>
+        <div class="demo-card">
+          <p>
+            The existing chat widget is loaded on this page. Open the floating chat button in the bottom-right corner to test
+            the experience.
+          </p>
+          <div class="demo-meta">
+            <span id="widget-status" class="status status-warn">Widget waiting for tenant token</span>
+            <span class="meta-row">
+              API base:
+              <code id="api-base-readout">-</code>
+            </span>
+            <span class="meta-row">
+              Tenant token:
+              <code id="tenant-token-readout">-</code>
+            </span>
+          </div>
+          <p class="demo-note">
+            Tip: pass token via URL for quick demos:
+            <code>?tenantToken=YOUR_TOKEN&amp;apiBaseUrl=http://localhost/api/v1</code>
+          </p>
+        </div>
+      </section>
+
+      <section id="pricing" class="section reveal delay-5">
+        <div class="section-head">
+          <p class="kicker">Pricing</p>
+          <h2>Choose The Plan That Fits Your Growth</h2>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3>Starter</h3>
+            <p class="price">₹20,000 <span>setup</span></p>
+            <p class="price-sub">₹3,000/month</p>
+            <ul>
+              <li>AI website chat widget</li>
+              <li>Lead capture + basic scoring</li>
+              <li>Dashboard visibility</li>
+            </ul>
+          </article>
+          <article class="price-card featured">
+            <p class="badge">Most Popular</p>
+            <h3>Professional</h3>
+            <p class="price">₹40,000 <span>setup</span></p>
+            <p class="price-sub">₹5,000/month</p>
+            <ul>
+              <li>Advanced qualification flow</li>
+              <li>Priority scoring and routing</li>
+              <li>Email alerts for qualified leads</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="book-demo" class="cta reveal delay-6">
+        <h2>Book a Demo</h2>
+        <p>See how your website can turn conversations into qualified pipeline within minutes.</p>
+        <a class="btn btn-primary btn-large" href="mailto:sales@example.com?subject=Book%20a%20Demo">Book a Demo</a>
+      </section>
+    </main>
+
+    <footer>
+      <p>AI Lead Qualification System</p>
+    </footer>
+
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+
+        var queryToken = params.get("tenantToken") || "";
+        var queryApiBase = params.get("apiBaseUrl") || "";
+
+        if (queryToken) {
+          localStorage.setItem("landing_tenant_token", queryToken);
+        }
+        if (queryApiBase) {
+          localStorage.setItem("landing_api_base_url", queryApiBase);
+        }
+
+        var storedToken = localStorage.getItem("landing_tenant_token") || "";
+        var storedApiBase = localStorage.getItem("landing_api_base_url") || "";
+        var productionApiBase = "https://your-api-service.up.railway.app/api/v1";
+
+        var fallbackApiBase;
+        if (window.location.origin.indexOf("localhost") !== -1) {
+          fallbackApiBase = "http://localhost/api/v1";
+        } else {
+          fallbackApiBase = productionApiBase;
+        }
+
+        var configured = window.AILeadWidgetConfig || {};
+        var resolvedApiBase = queryApiBase || storedApiBase || configured.apiBaseUrl || fallbackApiBase;
+        var resolvedToken = queryToken || storedToken || configured.tenantToken || "REPLACE_WITH_WIDGET_TOKEN";
+
+        window.AILeadWidgetConfig = {
+          apiBaseUrl: resolvedApiBase,
+          tenantToken: resolvedToken,
+        };
+
+        var statusEl = document.getElementById("widget-status");
+        var apiEl = document.getElementById("api-base-readout");
+        var tokenEl = document.getElementById("tenant-token-readout");
+
+        if (apiEl) {
+          apiEl.textContent = resolvedApiBase;
+        }
+
+        if (tokenEl) {
+          tokenEl.textContent = resolvedToken;
+        }
+
+        if (statusEl) {
+          if (resolvedToken === "REPLACE_WITH_WIDGET_TOKEN") {
+            statusEl.textContent = "Widget waiting for tenant token";
+            statusEl.className = "status status-warn";
+          } else {
+            statusEl.textContent = "Widget active";
+            statusEl.className = "status status-ok";
+          }
+        }
+      })();
+    </script>
+    <script>
+      (function loadWidgetScript() {
+        var candidates = ["../widget/lead-widget.js", "/frontend/widget/lead-widget.js", "/widget/lead-widget.js"];
+
+        function tryLoad(index) {
+          if (index >= candidates.length) {
+            var statusEl = document.getElementById("widget-status");
+            if (statusEl) {
+              statusEl.textContent = "Widget script failed to load";
+              statusEl.className = "status status-warn";
+            }
+            return;
+          }
+
+          var script = document.createElement("script");
+          script.src = candidates[index];
+          script.async = false;
+          script.onload = function () {
+            return;
+          };
+          script.onerror = function () {
+            tryLoad(index + 1);
+          };
+          document.body.appendChild(script);
+        }
+
+        tryLoad(0);
+      })();
+    </script>
+  </body>
+</html>

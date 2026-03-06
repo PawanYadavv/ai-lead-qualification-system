@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Lead Qualification Widget Demo</title>
+    <style>
+      :root {
+        --bg-a: #eff6ff;
+        --bg-b: #ecfeff;
+        --ink: #0f172a;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 20% 20%, var(--bg-a), transparent 45%),
+          radial-gradient(circle at 80% 80%, var(--bg-b), transparent 50%),
+          #f8fafc;
+      }
+
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 80px 24px;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: clamp(2rem, 5vw, 3.2rem);
+      }
+
+      p {
+        max-width: 650px;
+        line-height: 1.7;
+        font-size: 1.1rem;
+      }
+
+      code {
+        background: #e2e8f0;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AI Lead Qualification System</h1>
+      <p>
+        This page demonstrates the embeddable chatbot widget. Update
+        <code>tenantToken</code> in the inline config below with the token returned from
+        <code>/api/v1/auth/register</code>.
+      </p>
+    </main>
+
+    <script>
+      window.AILeadWidgetConfig = {
+        apiBaseUrl: "https://your-api-service.up.railway.app/api/v1",
+        tenantToken: "REPLACE_WITH_WIDGET_TOKEN"
+      };
+    </script>
+    <script src="./lead-widget.js"></script>
+  </body>
+</html>
