@@ -1,6 +1,6 @@
 (function () {
   var config = window.AILeadWidgetConfig || {};
-  var apiBase = config.apiBaseUrl || "https://your-api-service.up.railway.app/api/v1";
+  var apiBase = config.apiBaseUrl || "https://ai-lead-qualification-system-production.up.railway.app/api/v1";
   var tenantToken = config.tenantToken;
 
   if (!tenantToken) {
@@ -39,31 +39,47 @@
 
   async function ensureSession() {
     if (sessionId) {
-      return;
+      return true;
     }
 
-    var response = await fetch(apiBase + "/chatbot/session/start", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tenant_token: tenantToken,
-      }),
-    });
+    try {
+      var response = await fetch(apiBase + "/chatbot/session/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_token: tenantToken,
+        }),
+      });
 
-    if (!response.ok) {
-      addMessage("assistant", "We are having trouble connecting right now. Please try again soon.");
-      return;
+      if (!response.ok) {
+        addMessage("assistant", "We are having trouble connecting right now. Please try again soon.");
+        return false;
+      }
+
+      var data = await response.json();
+      sessionId = data.session_id;
+      addMessage("assistant", data.greeting_message);
+      return true;
+    } catch (err) {
+      addMessage(
+        "assistant",
+        "Connection blocked. If you opened demo.html directly, run it via http://localhost:8080 and try again."
+      );
+      return false;
     }
-
-    var data = await response.json();
-    sessionId = data.session_id;
-    addMessage("assistant", data.greeting_message);
   }
 
   async function sendMessage() {
     var text = inputEl.value.trim();
-    if (!text || !sessionId) {
+    if (!text) {
       return;
+    }
+
+    if (!sessionId) {
+      var ready = await ensureSession();
+      if (!ready) {
+        return;
+      }
     }
 
     inputEl.value = "";

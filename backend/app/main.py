@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import analytics, auth, chatbot, leads, notifications, tenants
 from app.core.config import settings
@@ -13,6 +14,7 @@ from app.models import Base
 app = FastAPI(title=settings.APP_NAME, version="0.1.0")
 
 DASHBOARD_FILE = Path(__file__).resolve().parent / "utils" / "test_dashboard.html"
+FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if FRONTEND_DIR.exists():
+    # Expose demo files under /frontend so widget pages can be tested from the same Railway domain.
+    app.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
 
 @app.on_event("startup")
