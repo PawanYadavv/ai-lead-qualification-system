@@ -1,6 +1,10 @@
 (function () {
   var config = window.AILeadWidgetConfig || {};
-  var apiBase = config.apiBaseUrl || "https://ai-lead-qualification-system-production.up.railway.app/api/v1";
+  var defaultApiBase = "https://ai-lead-qualification-system-production.up.railway.app/api/v1";
+  if (window.location && window.location.origin && window.location.origin.indexOf("http") === 0) {
+    defaultApiBase = window.location.origin.replace(/\/+$/, "") + "/api/v1";
+  }
+  var apiBase = config.apiBaseUrl || defaultApiBase;
   var tenantToken = config.tenantToken;
 
   if (!tenantToken) {
