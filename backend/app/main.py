@@ -33,6 +33,14 @@ if FRONTEND_DIR.exists():
 @app.on_event("startup")
 def on_startup() -> None:
     Base.metadata.create_all(bind=engine)
+    # Add columns that create_all won't add to existing tables
+    from sqlalchemy import inspect, text
+    insp = inspect(engine)
+    if "tenants" in insp.get_table_names():
+        cols = [c["name"] for c in insp.get_columns("tenants")]
+        if "is_active" not in cols:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE tenants ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE"))
 
 
 @app.get("/health")
