@@ -14,6 +14,7 @@ from app.models import Base
 app = FastAPI(title=settings.APP_NAME, version="0.1.0")
 
 DASHBOARD_FILE = Path(__file__).resolve().parent / "utils" / "test_dashboard.html"
+CLIENT_DASHBOARD = Path(__file__).resolve().parents[2] / "frontend" / "dashboard" / "index.html"
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 app.add_middleware(
@@ -44,6 +45,13 @@ def test_dashboard() -> HTMLResponse:
     if not DASHBOARD_FILE.exists():
         return HTMLResponse("<h1>Test dashboard not found.</h1>", status_code=404)
     return HTMLResponse(DASHBOARD_FILE.read_text(encoding="utf-8"))
+
+
+@app.get("/dashboard", response_class=HTMLResponse, include_in_schema=False)
+def client_dashboard() -> HTMLResponse:
+    if not CLIENT_DASHBOARD.exists():
+        return HTMLResponse("<h1>Dashboard not found.</h1>", status_code=404)
+    return HTMLResponse(CLIENT_DASHBOARD.read_text(encoding="utf-8"))
 
 
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
