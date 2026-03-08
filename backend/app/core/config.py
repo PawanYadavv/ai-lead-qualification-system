@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     PGUSER: str = ""
     PGPASSWORD: str = ""
     PGDATABASE: str = ""
-    DATABASE_SSLMODE: str = "prefer"
+    DATABASE_SSLMODE: str = "require"
 
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
@@ -118,16 +118,7 @@ class Settings(BaseSettings):
             if filtered:
                 return filtered
 
-        if self.APP_ENV.lower() == "production":
-            derived = [
-                self._normalize_origin(self.FRONTEND_BASE_URL),
-                self._normalize_origin(self.API_BASE_URL),
-            ]
-            filtered = [origin for origin in derived if origin]
-            if filtered:
-                # Preserve order while removing duplicates.
-                return list(dict.fromkeys(filtered))
-
+        # Widget must work on ANY client website, so always allow all origins.
         return ["*"]
 
 
