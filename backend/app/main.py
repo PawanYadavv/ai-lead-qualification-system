@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import analytics, auth, chatbot, leads, notifications, tenants
+from app.api.routes import admin, analytics, auth, chatbot, leads, notifications, tenants
 from app.core.config import settings
 from app.core.database import engine
 from app.models import Base
@@ -60,6 +60,7 @@ app.include_router(chatbot.router, prefix=settings.API_V1_PREFIX)
 app.include_router(leads.router, prefix=settings.API_V1_PREFIX)
 app.include_router(analytics.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
+app.include_router(admin.router, prefix=settings.API_V1_PREFIX)
 
 
 

@@ -11,6 +11,7 @@ class TenantOut(BaseModel):
     system_prompt: str | None
     qualification_threshold: int
     notification_email: EmailStr | None
+    is_active: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     FRONTEND_BASE_URL: str = "http://localhost"
 
     SECRET_KEY: str = "change-me-in-production"
+    ADMIN_API_KEY: str = "leadai-admin-secret-change-me"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 

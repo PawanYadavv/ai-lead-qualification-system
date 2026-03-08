@@ -22,6 +22,7 @@ class TenantBasic(BaseModel):
     slug: str
     widget_token: str
     qualification_threshold: int
+    is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
 

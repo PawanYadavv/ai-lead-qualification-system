@@ -25,6 +25,8 @@ def _get_tenant_by_widget_token(db: Session, tenant_token: str) -> Tenant:
     tenant = db.query(Tenant).filter(Tenant.widget_token == tenant_token).first()
     if not tenant:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid tenant token")
+    if not tenant.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Service suspended. Please contact support.")
     return tenant
 
 
