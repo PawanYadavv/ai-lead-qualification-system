@@ -34,25 +34,26 @@ def get_greeting_message() -> str:
 
 
 def _merge_extracted_data(lead: Lead, session: ChatSession, extracted: dict[str, str]) -> None:
-    if not lead.name and extracted.get("name"):
+    # Always update with the latest extracted data — later messages have more accurate info.
+    if extracted.get("name"):
         lead.name = extracted["name"]
         session.visitor_name = extracted["name"]
 
-    if not lead.email and extracted.get("email"):
+    if extracted.get("email"):
         lead.email = extracted["email"]
         session.visitor_email = extracted["email"]
 
-    if not lead.phone and extracted.get("phone"):
+    if extracted.get("phone"):
         lead.phone = extracted["phone"]
         session.visitor_phone = extracted["phone"]
 
-    if not lead.budget and extracted.get("budget"):
+    if extracted.get("budget"):
         lead.budget = extracted["budget"]
 
-    if not lead.timeline and extracted.get("timeline"):
+    if extracted.get("timeline"):
         lead.timeline = extracted["timeline"]
 
-    if not lead.requirement and extracted.get("requirement"):
+    if extracted.get("requirement"):
         lead.requirement = extracted["requirement"]
 
 

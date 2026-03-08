@@ -8,7 +8,10 @@ from app.core.config import settings
 
 EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 PHONE_PATTERN = re.compile(r"(?:\+?\d[\d\s().-]{7,}\d)")
-NAME_PATTERN = re.compile(r"\b(?:i am|i'm|my name is)\s+([A-Za-z][A-Za-z\s'-]{1,60})", re.IGNORECASE)
+NAME_PATTERN = re.compile(
+    r"\b(?:my name is|i'm|i am)\s+(?!good\b|fine\b|great\b|looking\b|here\b|interested\b|doing\b|writing\b|calling\b|searching\b)([A-Z][a-zA-Z'-]+(?:\s+[A-Z][a-zA-Z'-]+)*)",
+    re.IGNORECASE,
+)
 BUDGET_PATTERN = re.compile(r"(?:\bbudget\b(?!@)(?:\s+is|\s+around|\s+about|\s*:)?\s*)([^\n.,!?]+)", re.IGNORECASE)
 MONEY_PATTERN = re.compile(r"\$?\d+(?:[.,]\d+)?\s*[kKmM]?")
 TIMELINE_PATTERN = re.compile(
@@ -42,9 +45,19 @@ class OpenAIService:
         user_history = [item for item in history if item.get("role") == "user"]
         transcript = "\n".join([f"user: {item['content']}" for item in user_history])
         extraction_prompt = (
-            "Extract potential lead fields from this conversation transcript. "
-            "Return strict JSON with keys: name, email, phone, budget, timeline, requirement. "
-            "Use empty strings for unknown values."
+            "Extract lead information from this sales conversation transcript.\n"
+            "Return strict JSON with keys: name, email, phone, budget, timeline, requirement.\n"
+            "Rules:\n"
+            '- name: The person\'s ACTUAL NAME (e.g. "John Smith"). Do NOT use greetings, adjectives, '
+            'or phrases like "good", "fine", "looking for CRM" as a name. '
+            "If the user says 'my name is X' at any point, use that as the name.\n"
+            "- email: A valid email address.\n"
+            "- phone: A phone number.\n"
+            "- budget: The monetary budget mentioned.\n"
+            "- timeline: When they want to start or complete.\n"
+            "- requirement: What product/service they need.\n"
+            "Use empty strings for unknown values. If a field is corrected later in the conversation, "
+            "use the LATEST value."
         )
 
         try:
@@ -62,6 +75,7 @@ class OpenAIService:
             for key in ("name", "email", "phone", "budget", "timeline", "requirement"):
                 value = parsed.get(key)
                 if isinstance(value, str) and value.strip():
+                    # AI extraction is more accurate — always prefer it over regex.
                     extracted[key] = value.strip()
         except Exception:
             # Keep serving chat even if extraction fails.
