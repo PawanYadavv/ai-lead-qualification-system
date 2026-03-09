@@ -12,7 +12,7 @@ from app.services.prompt_templates import build_system_prompt
 
 VALIDATION_MESSAGES = {
     "email": "Hmm, that doesn't look like a valid email address. Could you double-check and share it again? (e.g. name@company.com)",
-    "phone": "That phone number doesn't seem right — could you re-enter it? It should be 7-15 digits (e.g. +91-9876543210).",
+    "phone": "That phone number doesn't seem right \u2014 please enter a valid 10-digit mobile number (e.g. +91-9876543210).",
 }
 
 

@@ -136,4 +136,9 @@ def is_valid_email(email: str) -> bool:
 
 def is_valid_phone(phone: str) -> bool:
     digits = re.sub(r"[^\d]", "", phone)
-    return 7 <= len(digits) <= 15
+    if len(digits) < 10 or len(digits) > 15:
+        return False
+    # Reject obvious fake sequences (all same digit or sequential)
+    if len(set(digits)) <= 2:
+        return False
+    return True
