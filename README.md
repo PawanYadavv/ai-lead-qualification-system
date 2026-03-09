@@ -1,263 +1,347 @@
-# AI Lead Qualification System (MVP)
+<div align="center">
 
-A production-structured FastAPI MVP that lets businesses embed an AI chatbot on their website, qualify visitors into leads, score them automatically, and notify the business when a lead is hot.
+# 🤖 AI Lead Qualification System
 
-## What this MVP includes
+**Turn every website visitor into a qualified lead — automatically.**
 
-- Multi-tenant architecture (per-business tenant configuration)
-- Embeddable chat widget (plain JavaScript)
-- AI conversation engine via OpenAI API
-- Lead data capture: name, email, phone, budget, timeline, requirement
-- Rule-based lead scoring with tenant threshold
-- Qualified lead notifications (email + dashboard record)
-- Admin APIs for leads, conversations, analytics
-- PostgreSQL persistence with SQLAlchemy ORM
-- Optional Qdrant integration switch for vector support
-- Docker and docker-compose setup
+An AI-powered SaaS platform that embeds an intelligent chatbot on any website, engages visitors in natural conversation, extracts lead data, scores them in real-time, and delivers qualified leads to a polished dashboard.
 
-## Project structure
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Railway-0B0D17?style=for-the-badge)](https://ai-lead-qualification-system-production.up.railway.app/dashboard)
+[![API Docs](https://img.shields.io/badge/📄_API_Docs-Swagger-85EA2D?style=for-the-badge)](https://ai-lead-qualification-system-production.up.railway.app/docs)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
 
-```text
-backend/
-  app/
-    main.py
-    api/
-      deps.py
-      routes/
-        auth.py
-        tenants.py
-        chatbot.py
-        leads.py
-        notifications.py
-        analytics.py
-    core/
-      config.py
-      database.py
-      security.py
-    models/
-      base.py
-      tenant.py
-      user.py
-      chat_session.py
-      message.py
-      lead.py
-      notification.py
-    schemas/
-      auth.py
-      tenant.py
-      chatbot.py
-      lead.py
-      notification.py
-      analytics.py
-    services/
-      prompt_templates.py
-      openai_service.py
-      lead_scoring.py
-      conversation_service.py
-      notification_service.py
-      qdrant_service.py
-    utils/
-frontend/
-  landing/
-    index.html
-    style.css
-  widget/
-    lead-widget.js
-    demo.html
-Dockerfile
-docker/
-  backend.Dockerfile
-nginx.conf
-docker-compose.yml
-.env.example
-README.md
+</div>
+
+---
+
+## The Problem
+
+Businesses spend thousands on ads driving traffic to their website, but **96% of visitors leave without converting**. Manual live chat doesn't scale, and generic contact forms have <2% conversion rates.
+
+## The Solution
+
+An AI chatbot that **feels like a real conversation** — it greets visitors, understands their needs, collects contact info naturally, and scores them as leads. Business owners get a real-time dashboard with only the leads that matter.
+
+---
+
+## ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **🤖 AI Chat Engine** | GPT-4o-mini powered conversations that naturally extract lead data (name, email, phone, budget, timeline, requirements) |
+| **📊 Real-time Dashboard** | Professional SPA with login/register, live stats, lead tables with scoring, and integration setup |
+| **🎨 Customizable Widget** | 2-line embed code. Customize colors, position, header text, welcome message — matches any brand |
+| **📈 Intelligent Lead Scoring** | Automated 0-100 scoring based on data completeness, budget signals, and timeline urgency |
+| **🏢 Multi-Tenant Architecture** | Each business gets isolated data, unique widget token, and independent settings |
+| **🔐 JWT Authentication** | Secure token-based auth with tenant isolation — no data leaks between clients |
+| **⚡ Admin API** | Activate/deactivate tenants, manage billing status via protected admin endpoints |
+| **📧 Email Notifications** | SMTP-ready alerts when qualified leads come in (configurable per tenant) |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     CLIENT'S WEBSITE                        │
+│                                                             │
+│   ┌─────────────────────────────────────┐                   │
+│   │      Embeddable Chat Widget         │  ← 2 lines of JS │
+│   │   (lead-widget.js + config)         │                   │
+│   └──────────────┬──────────────────────┘                   │
+└──────────────────┼──────────────────────────────────────────┘
+                   │ REST API calls
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    FastAPI Backend                           │
+│                                                             │
+│  ┌──────────┐  ┌──────────────┐  ┌───────────────────┐     │
+│  │ Auth &   │  │  Chatbot     │  │  Lead Scoring     │     │
+│  │ Tenants  │  │  Engine      │  │  Engine           │     │
+│  └──────────┘  └──────┬───────┘  └───────────────────┘     │
+│                       │                                     │
+│              ┌────────▼────────┐                            │
+│              │  OpenAI API     │                            │
+│              │  (GPT-4o-mini)  │                            │
+│              └─────────────────┘                            │
+│                                                             │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │              PostgreSQL Database                      │   │
+│  │  tenants | users | sessions | messages | leads       │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Business Owner Dashboard                        │
+│                                                             │
+│   📊 Overview Stats  │  👥 Lead Table  │  🔗 Integration   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## Backend modules
+---
 
-- `auth`: JWT auth, tenant+admin registration, login
-- `tenants`: manage tenant chatbot settings and threshold
-- `chatbot`: public session/message APIs + admin conversations API
-- `leads`: list leads and scores per tenant
-- `notifications`: dashboard notifications per tenant
-- `analytics`: lead and conversation summary metrics
+## 🛠️ Tech Stack
 
-## Core API endpoints
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | Python 3.11, FastAPI, SQLAlchemy ORM, Pydantic v2 |
+| **AI Engine** | OpenAI GPT-4o-mini (chat + entity extraction) |
+| **Database** | PostgreSQL (Railway-managed) |
+| **Auth** | JWT (python-jose), OAuth2 Bearer scheme |
+| **Frontend** | Vanilla JavaScript SPA (zero framework dependencies) |
+| **Widget** | Self-contained JS file — works on any website |
+| **Deployment** | Docker, Railway (auto-deploy on push) |
+| **Infrastructure** | Nginx reverse proxy, CORS configured for cross-origin widget |
 
-Base URL (via Nginx): `http://localhost/api/v1`
+---
 
-### Auth
+## 📁 Project Structure
 
-- `POST /auth/register`
-- `POST /auth/login`
-
-### Public chatbot (for website widget)
-
-- `POST /chatbot/session/start`
-- `POST /chatbot/session/{session_id}/message`
-- `GET /chatbot/session/{session_id}/messages?tenant_token=...`
-
-### Admin (JWT required)
-
-- `GET /tenants/me`
-- `PATCH /tenants/me`
-- `GET /leads`
-- `GET /conversations`
-- `GET /analytics`
-- `GET /notifications`
-
-## Deploy on Railway (exact steps)
-
-1. Push the repository to GitHub.
-2. Open Railway and create a new project from the GitHub repository.
-3. Add a PostgreSQL service in the same Railway project.
-4. Open the API service in Railway and confirm it builds using the root `Dockerfile`.
-5. In the API service `Variables` tab, set these values:
-
-```env
-APP_ENV=production
-API_V1_PREFIX=/api/v1
-SECRET_KEY=replace-with-a-long-random-secret
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-OPENAI_API_KEY=replace-with-your-openai-key
-OPENAI_MODEL=gpt-4o-mini
-DATABASE_URL=${{Postgres.DATABASE_URL}}
-DATABASE_SSLMODE=require
-USE_QDRANT=false
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-SMTP_FROM_EMAIL=noreply@example.com
-SMTP_USE_TLS=true
-FRONTEND_BASE_URL=https://your-frontend-domain.com
-BACKEND_CORS_ORIGINS=https://your-frontend-domain.com
+```
+├── backend/
+│   └── app/
+│       ├── main.py                    # FastAPI app, CORS, startup migrations
+│       ├── api/
+│       │   ├── deps.py                # Auth dependencies (JWT extraction)
+│       │   └── routes/
+│       │       ├── auth.py            # Register + Login (JWT)
+│       │       ├── chatbot.py         # Widget session & message endpoints
+│       │       ├── leads.py           # Lead CRUD with tenant isolation
+│       │       ├── analytics.py       # Dashboard stats aggregation
+│       │       ├── tenants.py         # Tenant settings management
+│       │       ├── notifications.py   # Email notification endpoints
+│       │       └── admin.py           # Tenant activate/deactivate (API key auth)
+│       ├── core/
+│       │   ├── config.py              # Pydantic Settings (env-driven)
+│       │   ├── database.py            # SQLAlchemy engine & session
+│       │   └── security.py            # Password hashing, JWT creation
+│       ├── models/                    # SQLAlchemy ORM models
+│       │   ├── tenant.py              # Multi-tenant with widget_token + is_active
+│       │   ├── user.py                # Users with tenant FK
+│       │   ├── chat_session.py        # Conversation sessions
+│       │   ├── message.py             # Chat messages (user + AI)
+│       │   ├── lead.py                # Extracted lead data + score
+│       │   └── notification.py        # Lead notification records
+│       ├── schemas/                   # Pydantic request/response models
+│       └── services/
+│           ├── openai_service.py      # GPT-4o-mini chat + entity extraction
+│           ├── conversation_service.py # Orchestrates chat → extract → score → notify
+│           ├── lead_scoring.py        # Rule-based 0-100 scoring algorithm
+│           ├── notification_service.py # SMTP email delivery
+│           └── prompt_templates.py    # System prompts for AI behavior
+├── frontend/
+│   ├── dashboard/
+│   │   └── index.html                # Full SPA: login, stats, leads, integration
+│   ├── widget/
+│   │   ├── lead-widget.js            # Embeddable chat widget (customizable)
+│   │   └── demo.html                 # Widget demo page
+│   └── landing/
+│       ├── index.html                # Product landing page
+│       └── style.css
+├── docker/
+│   └── backend.Dockerfile
+├── Dockerfile                         # Production container
+├── docker-compose.yml                 # Local dev stack
+├── nginx.conf                         # Reverse proxy config
+└── .env.example                       # Environment template
 ```
 
-6. Deploy the API service. Railway injects `PORT` automatically, and the container command already binds to `0.0.0.0:${PORT}`.
-7. Go to `Settings -> Networking` for the API service and click `Generate Domain` to make it publicly accessible.
-8. Copy the generated public URL, then set:
+---
 
-```env
-API_BASE_URL=https://your-api-service.up.railway.app
-```
+## 🚀 Quick Start
 
-9. Redeploy once after setting `API_BASE_URL`.
-10. Validate production endpoints:
+### Prerequisites
+
+- Python 3.11+
+- PostgreSQL (or Docker)
+- OpenAI API key
+
+### Option 1: Docker (Recommended)
 
 ```bash
-curl https://your-api-service.up.railway.app/health
-curl https://your-api-service.up.railway.app/docs
-```
+# Clone the repo
+git clone https://github.com/PawanYadavv/ai-lead-qualification-system.git
+cd ai-lead-qualification-system
 
-11. Register a tenant to get a `widget_token`:
+# Configure environment
+cp .env.example .env
+# Edit .env → set OPENAI_API_KEY
 
-```bash
-curl -X POST https://your-api-service.up.railway.app/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "business_name": "Acme Solar",
-    "full_name": "Owner",
-    "email": "owner@acme.com",
-    "password": "StrongPass123",
-    "notification_email": "owner@acme.com"
-  }'
-```
-
-12. In widget config, set:
-
-```js
-window.AILeadWidgetConfig = {
-  apiBaseUrl: "https://your-api-service.up.railway.app/api/v1",
-  tenantToken: "YOUR_WIDGET_TOKEN"
-};
-```
-
-13. If your frontend is hosted on Railway too, set `FRONTEND_BASE_URL` and `BACKEND_CORS_ORIGINS` to that public frontend domain.
-
-## Local run (Docker)
-
-1. Create `.env` from `.env.example` and set:
-
-```env
-APP_ENV=production
-API_BASE_URL=http://localhost
-FRONTEND_BASE_URL=http://localhost:8080
-NGINX_HOST_PORT=80
-OPENAI_API_KEY=
-```
-
-Production CORS behavior:
-
-- If `BACKEND_CORS_ORIGINS` is explicitly set, it is used.
-- Otherwise in `APP_ENV=production`, allowed origins are derived from `FRONTEND_BASE_URL` and `API_BASE_URL`.
-2. Start services:
-
-```bash
+# Start everything
 docker-compose up --build
 ```
 
-3. API will be available via Nginx:
+Services:
+- API: `http://localhost/api/v1`
+- Swagger Docs: `http://localhost/docs`
+- Dashboard: `http://localhost/dashboard`
 
-- `http://localhost`
-- Swagger docs: `http://localhost/docs`
-- API base URL: `http://localhost/api/v1`
-- PostgreSQL host port: `localhost:${POSTGRES_HOST_PORT}` (default: `5432`)
-- Backend stays internal as `api:8000` (not published directly).
-
-If host port `80` is restricted on your machine, set `NGINX_HOST_PORT` to another value (for example `8081`) and use `http://localhost:8081`.
-
-4. Register a tenant/admin user:
+### Option 2: Local Development
 
 ```bash
-curl -X POST http://localhost/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "business_name": "Acme Solar",
-    "full_name": "Owner",
-    "email": "owner@acme.com",
-    "password": "StrongPass123",
-    "notification_email": "owner@acme.com"
-  }'
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate   # Windows
+
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Set environment variables
+export DATABASE_URL=postgresql://user:pass@localhost:5432/leadai
+export OPENAI_API_KEY=your-key-here
+export SECRET_KEY=your-secret-key
+
+# Run
+uvicorn backend.app.main:app --reload
 ```
 
-The response includes `tenant.widget_token` to use in the widget config.
+---
 
-## Easy testing (no PowerShell)
+## 🔌 API Reference
 
-If PowerShell API calls feel difficult, use the included one-command smoke test.
+### Authentication
 
-### Option A: Single-click HTML dashboard (zero terminal commands)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/auth/register` | Register business + admin user → returns JWT + widget token |
+| `POST` | `/api/v1/auth/login` | Login → returns JWT |
 
-1. Ensure Docker services are running.
-2. Open this URL in browser:
+### Chat Widget (Public — no auth required)
 
-`http://localhost/test-dashboard` (or `http://localhost:<NGINX_HOST_PORT>/test-dashboard` if overridden)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/chatbot/session/start` | Start conversation (requires `tenant_token`) |
+| `POST` | `/api/v1/chatbot/session/{id}/message` | Send visitor message → get AI response |
+| `GET` | `/api/v1/chatbot/session/{id}/messages` | Fetch conversation history |
 
-3. Click `Run Full Test` (or test individual endpoint buttons).
+### Dashboard (JWT required)
 
-Optional Windows launcher:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/leads` | List all leads with scores |
+| `GET` | `/api/v1/analytics` | Dashboard stats (total leads, qualified count, avg score) |
+| `GET` | `/api/v1/conversations` | All chat sessions |
+| `GET` | `/api/v1/notifications` | Lead notifications |
+| `GET` | `/api/v1/tenants/me` | Current tenant info |
+| `PATCH` | `/api/v1/tenants/me` | Update tenant settings |
 
-`scripts/open_test_dashboard.bat`
+### Admin (API Key required)
 
-1. Keep Docker services running:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/admin/tenants` | List all tenants |
+| `PATCH` | `/api/v1/admin/tenants/{id}/activate` | Activate a tenant |
+| `PATCH` | `/api/v1/admin/tenants/{id}/deactivate` | Suspend a tenant |
 
-```bash
-docker-compose up -d
+---
+
+## 🎨 Widget Integration
+
+Embed the AI chatbot on **any website** with just 2 lines:
+
+```html
+<script>
+  window.AILeadWidgetConfig = {
+    apiBaseUrl: "https://your-api-domain.com/api/v1",
+    tenantToken: "your-widget-token-here"
+  };
+</script>
+<script src="https://your-api-domain.com/frontend/widget/lead-widget.js"></script>
 ```
 
-2. Run the automated end-to-end test:
+### Customization Options
 
-```bash
-python scripts/easy_test.py --base-url http://localhost/api/v1
+```html
+<script>
+  window.AILeadWidgetConfig = {
+    apiBaseUrl: "https://your-api-domain.com/api/v1",
+    tenantToken: "your-widget-token",
+    primaryColor: "#0f766e",       // Widget accent color
+    headerText: "Chat with us",    // Chat window title
+    position: "right",             // "right" or "left"
+    welcomeMessage: "Hi! How can we help you today?"
+  };
+</script>
+<script src="https://your-api-domain.com/frontend/widget/lead-widget.js"></script>
 ```
 
-This test automatically verifies:
+---
 
-- `/health`
-- register + login
-- chatbot session start + message
-- `/leads`, `/conversations`, `/analytics`, `/notifications`
+## 📊 Lead Scoring Algorithm
+
+Leads are scored on a **0–100 scale** based on:
+
+| Factor | Weight | Criteria |
+|--------|--------|----------|
+| Name provided | 15 pts | Valid name detected |
+| Email provided | 20 pts | Valid email format |
+| Phone provided | 15 pts | Phone number detected |
+| Budget mentioned | 20 pts | Budget/price discussed |
+| Timeline given | 15 pts | Timeline or urgency mentioned |
+| Requirement shared | 15 pts | Specific need described |
+
+Leads scoring above the tenant's threshold (default: 70) are automatically marked **Qualified** and trigger notifications.
+
+---
+
+## 🚢 Deploy to Railway
+
+1. Fork/push repo to GitHub
+2. Create a Railway project → add **PostgreSQL** service
+3. Add your API service from GitHub repo
+4. Set environment variables:
+
+```env
+APP_ENV=production
+SECRET_KEY=<random-64-char-string>
+OPENAI_API_KEY=<your-openai-key>
+OPENAI_MODEL=gpt-4o-mini
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+DATABASE_SSLMODE=require
+ADMIN_API_KEY=<your-admin-secret>
+```
+
+5. Generate a public domain in Railway → Settings → Networking
+6. Done — auto-deploys on every `git push`
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Multi-tenant architecture with JWT auth
+- [x] AI-powered chat with GPT-4o-mini
+- [x] Real-time lead extraction (name, email, phone, budget, timeline)
+- [x] Automated lead scoring (0-100)
+- [x] Client dashboard with login/register
+- [x] Embeddable & customizable widget
+- [x] Tenant activation/deactivation (billing control)
+- [x] Admin API with API key protection
+- [ ] CSV/Excel lead export
+- [ ] WhatsApp & Slack notifications
+- [ ] Custom AI personality per tenant
+- [ ] Analytics charts & conversion funnels
+- [ ] Stripe billing integration
+- [ ] Forgot password / password reset
+
+---
+
+## 📄 License
+
+This project is for portfolio/demonstration purposes.
+
+---
+
+<div align="center">
+
+**Built with FastAPI + OpenAI + PostgreSQL**
+
+If this project helped you, consider giving it a ⭐
+
+</div>
 
 On Windows, you can also double-click:
 
