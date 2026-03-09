@@ -8,6 +8,8 @@ from app.core.config import settings
 
 EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 PHONE_PATTERN = re.compile(r"(?:\+?\d[\d\s().-]{7,}\d)")
+VALID_EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
+VALID_PHONE_PATTERN = re.compile(r"^\+?[\d\s().-]{7,15}$")
 NAME_PATTERN = re.compile(
     r"\b(?:my name is|i'm|i am)\s+(?!good\b|fine\b|great\b|looking\b|here\b|interested\b|doing\b|writing\b|calling\b|searching\b)([A-Z][a-zA-Z'-]+(?:\s+[A-Z][a-zA-Z'-]+)*)",
     re.IGNORECASE,
@@ -126,3 +128,12 @@ class OpenAIService:
 
 def get_openai_service() -> OpenAIService:
     return OpenAIService()
+
+
+def is_valid_email(email: str) -> bool:
+    return bool(VALID_EMAIL_PATTERN.match(email.strip()))
+
+
+def is_valid_phone(phone: str) -> bool:
+    digits = re.sub(r"[^\d]", "", phone)
+    return 7 <= len(digits) <= 15

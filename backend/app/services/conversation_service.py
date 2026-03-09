@@ -6,8 +6,29 @@ from app.models.message import Message
 from app.models.tenant import Tenant
 from app.services.lead_scoring import calculate_lead_score
 from app.services.notification_service import send_qualified_lead_notification
-from app.services.openai_service import OpenAIService, get_openai_service
+from app.services.openai_service import OpenAIService, get_openai_service, is_valid_email, is_valid_phone
 from app.services.prompt_templates import build_system_prompt
+
+
+VALIDATION_MESSAGES = {
+    "email": "Hmm, that doesn't look like a valid email address. Could you double-check and share it again? (e.g. name@company.com)",
+    "phone": "That phone number doesn't seem right — could you re-enter it? It should be 7-15 digits (e.g. +91-9876543210).",
+}
+
+
+def _validate_extracted_data(extracted: dict[str, str]) -> tuple[dict[str, str], str | None]:
+    """Validate extracted email/phone. Returns cleaned data and an optional correction message."""
+    correction = None
+
+    if extracted.get("email") and not is_valid_email(extracted["email"]):
+        bad_email = extracted.pop("email")
+        correction = VALIDATION_MESSAGES["email"]
+
+    if extracted.get("phone") and not is_valid_phone(extracted["phone"]):
+        bad_phone = extracted.pop("phone")
+        correction = VALIDATION_MESSAGES["phone"]
+
+    return extracted, correction
 
 
 REQUIRED_FIELDS = ["name", "email", "phone", "budget", "timeline", "requirement"]
@@ -96,6 +117,7 @@ def process_chat_turn(
     history = [{"role": row.role, "content": row.content} for row in history_rows]
 
     extracted = ai_service.extract_lead_fields(history)
+    extracted, validation_correction = _validate_extracted_data(extracted)
     _merge_extracted_data(lead, session, extracted)
 
     lead.score = calculate_lead_score(lead)
@@ -104,9 +126,14 @@ def process_chat_turn(
 
     missing_fields = get_missing_fields(lead)
     prompt = build_system_prompt(tenant.system_prompt, missing_fields)
-    assistant_reply = ai_service.generate_chat_response(prompt, history)
-    if not assistant_reply:
-        assistant_reply = _fallback_reply(missing_fields)
+
+    # If validation failed, override AI response with correction message
+    if validation_correction:
+        assistant_reply = validation_correction
+    else:
+        assistant_reply = ai_service.generate_chat_response(prompt, history)
+        if not assistant_reply:
+            assistant_reply = _fallback_reply(missing_fields)
 
     assistant_record = Message(
         session_id=session.id,
