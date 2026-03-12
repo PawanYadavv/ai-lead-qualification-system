@@ -14,16 +14,16 @@ PHONE_PATTERN = re.compile(r"(?:\+?\d[\d\s().-]{7,}\d)")
 VALID_EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 VALID_PHONE_PATTERN = re.compile(r"^\+?[\d\s().-]{7,15}$")
 NAME_PATTERN = re.compile(
-    r"\b(?:my name is|i'm|i am)\s+(?!good\b|fine\b|great\b|looking\b|here\b|interested\b|doing\b|writing\b|calling\b|searching\b)([A-Z][a-zA-Z'-]+(?:\s+[A-Z][a-zA-Z'-]+)*)",
+    r"\b(?:my name is|i'm|i am|this is|call me)\s+(?!good\b|fine\b|great\b|looking\b|here\b|interested\b|doing\b|writing\b|calling\b|searching\b)([A-Za-z][a-zA-Z'-]+(?:\s+[A-Za-z][a-zA-Z'-]+)*)",
     re.IGNORECASE,
 )
-BUDGET_PATTERN = re.compile(r"(?:\bbudget\b(?!@)(?:\s+is|\s+around|\s+about|\s*:)?\s*)([^\n.,!?]+)", re.IGNORECASE)
-MONEY_PATTERN = re.compile(r"\$?\d+(?:[.,]\d+)?\s*[kKmM]?")
+BUDGET_PATTERN = re.compile(r"(?:\bbudget\b(?!@)(?:\s+is|\s+around|\s+about|\s+of|\s*:)?\s*)([^\n.,!?]+)", re.IGNORECASE)
+MONEY_PATTERN = re.compile(r"(?:[\$\u20b9]|Rs\.?\s*)?\d+(?:[.,]\d+)?\s*(?:k|m|cr|crore|lakh|lakhs|lac)?", re.IGNORECASE)
 TIMELINE_PATTERN = re.compile(
-    r"(asap|immediately|this month|next month|\d+\s*(?:day|days|week|weeks|month|months))",
+    r"(asap|immediately|this month|next month|next week|this week|next quarter|next year|within a year|by end of year|q[1-4]|\d+\s*(?:day|days|week|weeks|month|months|year|years))",
     re.IGNORECASE,
 )
-REQUIREMENT_PATTERN = re.compile(r"(?:we need|i need|we want to|i want to)\s+([^\n.!?]+)", re.IGNORECASE)
+REQUIREMENT_PATTERN = re.compile(r"(?:we need|i need|we want to|i want to|we're looking for|i'm looking for|looking for|we require|our requirement is|i'm interested in|interested in)\s+([^\n.!?]+)", re.IGNORECASE)
 
 
 class OpenAIService:
@@ -38,6 +38,7 @@ class OpenAIService:
             response = self.client.chat.completions.create(
                 model=settings.OPENAI_MODEL,
                 temperature=0.4,
+                max_tokens=300,
                 messages=[{"role": "system", "content": system_prompt}, *history],
             )
             return (response.choices[0].message.content or "").strip()

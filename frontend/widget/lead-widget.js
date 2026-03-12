@@ -21,6 +21,16 @@
   var sessionId = null;
   var isOpen = false;
 
+  // Restore session from previous page visit
+  var STORAGE_KEY = "ai_lead_session_" + tenantToken.slice(0, 8);
+  try {
+    sessionId = sessionStorage.getItem(STORAGE_KEY) || null;
+  } catch (e) {}
+
+  function _saveSession() {
+    try { sessionStorage.setItem(STORAGE_KEY, sessionId); } catch (e) {}
+  }
+
   var style = document.createElement("style");
   style.innerHTML =
     ".ai-lead-widget-btn {" +
@@ -159,6 +169,7 @@
 
       var data = await response.json();
       sessionId = data.session_id;
+      _saveSession();
       addMessage("assistant", welcomeMsg || data.greeting_message);
       return true;
     } catch (err) {
@@ -218,7 +229,19 @@
     panel.style.display = isOpen ? "flex" : "none";
     button.innerHTML = isOpen ? "&#x2715;" : "&#x1F4AC;";
     if (isOpen && !sessionId) ensureSession();
+    if (isOpen && sessionId && messagesEl.children.length === 0) restoreMessages();
     if (isOpen) inputEl.focus();
+  }
+
+  async function restoreMessages() {
+    try {
+      var response = await fetch(apiBase + "/chatbot/session/" + sessionId + "/messages?tenant_token=" + encodeURIComponent(tenantToken));
+      if (!response.ok) { sessionId = null; try { sessionStorage.removeItem(STORAGE_KEY); } catch(e){} ensureSession(); return; }
+      var messages = await response.json();
+      messages.forEach(function(m) { addMessage(m.role, m.content); });
+    } catch (err) {
+      sessionId = null; try { sessionStorage.removeItem(STORAGE_KEY); } catch(e){} ensureSession();
+    }
   }
 
   button.addEventListener("click", togglePanel);

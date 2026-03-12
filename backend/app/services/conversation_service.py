@@ -19,20 +19,21 @@ VALIDATION_MESSAGES = {
 
 def _validate_extracted_data(extracted: dict[str, str]) -> tuple[dict[str, str], str | None]:
     """Validate extracted email/phone/name. Returns cleaned data and an optional correction message."""
-    correction = None
+    corrections: list[str] = []
 
     if extracted.get("name") and not is_valid_name(extracted["name"]):
-        bad_name = extracted.pop("name")
-        correction = VALIDATION_MESSAGES["name"]
+        extracted.pop("name")
+        corrections.append(VALIDATION_MESSAGES["name"])
 
     if extracted.get("email") and not is_valid_email(extracted["email"]):
-        bad_email = extracted.pop("email")
-        correction = VALIDATION_MESSAGES["email"]
+        extracted.pop("email")
+        corrections.append(VALIDATION_MESSAGES["email"])
 
     if extracted.get("phone") and not is_valid_phone(extracted["phone"]):
-        bad_phone = extracted.pop("phone")
-        correction = VALIDATION_MESSAGES["phone"]
+        extracted.pop("phone")
+        corrections.append(VALIDATION_MESSAGES["phone"])
 
+    correction = " Also, ".join(corrections) if corrections else None
     return extracted, correction
 
 

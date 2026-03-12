@@ -1,3 +1,5 @@
+import hmac
+
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -10,7 +12,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 def _verify_admin_key(x_admin_key: str = Header(...)) -> str:
-    if x_admin_key != settings.ADMIN_API_KEY:
+    if not hmac.compare_digest(x_admin_key, settings.ADMIN_API_KEY):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid admin key")
     return x_admin_key
 

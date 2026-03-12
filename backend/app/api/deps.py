@@ -40,4 +40,6 @@ def get_current_tenant(
     tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
     if tenant is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant not found")
+    if not tenant.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account suspended. Please contact support.")
     return tenant
