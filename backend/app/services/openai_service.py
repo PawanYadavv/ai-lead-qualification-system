@@ -1,9 +1,12 @@
 import json
+import logging
 import re
 
 from openai import OpenAI
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
@@ -31,12 +34,16 @@ class OpenAIService:
         if not self.client:
             return self._fallback_response(history)
 
-        response = self.client.chat.completions.create(
-            model=settings.OPENAI_MODEL,
-            temperature=0.4,
-            messages=[{"role": "system", "content": system_prompt}, *history],
-        )
-        return (response.choices[0].message.content or "").strip()
+        try:
+            response = self.client.chat.completions.create(
+                model=settings.OPENAI_MODEL,
+                temperature=0.4,
+                messages=[{"role": "system", "content": system_prompt}, *history],
+            )
+            return (response.choices[0].message.content or "").strip()
+        except Exception as exc:
+            logger.error("OpenAI chat response failed: %s", exc)
+            return self._fallback_response(history)
 
     def extract_lead_fields(self, history: list[dict[str, str]]) -> dict[str, str]:
         extracted = self._extract_with_regex(history)
@@ -140,5 +147,18 @@ def is_valid_phone(phone: str) -> bool:
         return False
     # Reject obvious fake sequences (all same digit or sequential)
     if len(set(digits)) <= 2:
+        return False
+    return True
+
+
+def is_valid_name(name: str) -> bool:
+    """Reject obviously fake names: too short, all digits, or single repeated character."""
+    cleaned = name.strip()
+    if len(cleaned) < 2:
+        return False
+    if not re.search(r"[A-Za-z]", cleaned):
+        return False
+    # Reject single repeated character like "aaa"
+    if len(set(cleaned.lower().replace(" ", ""))) <= 1:
         return False
     return True

@@ -38,8 +38,10 @@ class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+
 class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
     tenant: TenantBasic
+    

@@ -6,19 +6,24 @@ from app.models.message import Message
 from app.models.tenant import Tenant
 from app.services.lead_scoring import calculate_lead_score
 from app.services.notification_service import send_qualified_lead_notification
-from app.services.openai_service import OpenAIService, get_openai_service, is_valid_email, is_valid_phone
+from app.services.openai_service import OpenAIService, get_openai_service, is_valid_email, is_valid_name, is_valid_phone
 from app.services.prompt_templates import build_system_prompt
 
 
 VALIDATION_MESSAGES = {
     "email": "Hmm, that doesn't look like a valid email address. Could you double-check and share it again? (e.g. name@company.com)",
     "phone": "That phone number doesn't seem right \u2014 please enter a valid 10-digit mobile number (e.g. +91-9876543210).",
+    "name": "I didn't quite catch your name — could you share your full name?",
 }
 
 
 def _validate_extracted_data(extracted: dict[str, str]) -> tuple[dict[str, str], str | None]:
-    """Validate extracted email/phone. Returns cleaned data and an optional correction message."""
+    """Validate extracted email/phone/name. Returns cleaned data and an optional correction message."""
     correction = None
+
+    if extracted.get("name") and not is_valid_name(extracted["name"]):
+        bad_name = extracted.pop("name")
+        correction = VALIDATION_MESSAGES["name"]
 
     if extracted.get("email") and not is_valid_email(extracted["email"]):
         bad_email = extracted.pop("email")
@@ -116,7 +121,10 @@ def process_chat_turn(
     )
     history = [{"role": row.role, "content": row.content} for row in history_rows]
 
-    extracted = ai_service.extract_lead_fields(history)
+    # Use full history for extraction (to find all mentioned fields),
+    # but cap what we send for chat generation to avoid context overflow.
+    MAX_CHAT_HISTORY = 30
+    extracted = ai_service.extract_lead_fields(history[-MAX_CHAT_HISTORY:])
     extracted, validation_correction = _validate_extracted_data(extracted)
     _merge_extracted_data(lead, session, extracted)
 
@@ -131,7 +139,7 @@ def process_chat_turn(
     if validation_correction:
         assistant_reply = validation_correction
     else:
-        assistant_reply = ai_service.generate_chat_response(prompt, history)
+        assistant_reply = ai_service.generate_chat_response(prompt, history[-MAX_CHAT_HISTORY:])
         if not assistant_reply:
             assistant_reply = _fallback_reply(missing_fields)
 

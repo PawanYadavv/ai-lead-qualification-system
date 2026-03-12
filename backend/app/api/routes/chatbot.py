@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
+import time
+from collections import defaultdict
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from sqlalchemy.orm import Session, joinedload
 
 from app.api.deps import get_current_tenant
 from app.core.database import get_db
@@ -19,6 +22,21 @@ from app.services.conversation_service import get_greeting_message, process_chat
 
 
 router = APIRouter(tags=["chatbot"])
+
+# Simple in-memory rate limiter: max 20 messages per session per minute
+_rate_buckets: dict[str, list[float]] = defaultdict(list)
+RATE_LIMIT = 20
+RATE_WINDOW = 60  # seconds
+
+
+def _check_rate_limit(session_id: str) -> None:
+    now = time.monotonic()
+    bucket = _rate_buckets[session_id]
+    # Evict old entries
+    _rate_buckets[session_id] = [t for t in bucket if now - t < RATE_WINDOW]
+    if len(_rate_buckets[session_id]) >= RATE_LIMIT:
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many messages. Please slow down.")
+    _rate_buckets[session_id].append(now)
 
 
 def _get_tenant_by_widget_token(db: Session, tenant_token: str) -> Tenant:
@@ -74,6 +92,8 @@ def send_chat_message(
 ) -> ChatMessageResponse:
     tenant = _get_tenant_by_widget_token(db, payload.tenant_token)
 
+    _check_rate_limit(session_id)
+
     session = (
         db.query(ChatSession)
         .filter(ChatSession.id == session_id, ChatSession.tenant_id == tenant.id)
@@ -119,6 +139,7 @@ def get_tenant_conversations(
 ) -> list[ConversationOut]:
     sessions = (
         db.query(ChatSession)
+        .options(joinedload(ChatSession.messages))
         .filter(ChatSession.tenant_id == current_tenant.id)
         .order_by(ChatSession.created_at.desc())
         .limit(limit)
@@ -127,12 +148,7 @@ def get_tenant_conversations(
 
     response: list[ConversationOut] = []
     for session in sessions:
-        messages = (
-            db.query(Message)
-            .filter(Message.session_id == session.id)
-            .order_by(Message.created_at.asc())
-            .all()
-        )
+        sorted_msgs = sorted(session.messages, key=lambda m: m.created_at)
         response.append(
             ConversationOut(
                 session_id=session.id,
@@ -141,7 +157,7 @@ def get_tenant_conversations(
                 visitor_email=session.visitor_email,
                 visitor_phone=session.visitor_phone,
                 created_at=session.created_at,
-                messages=messages,
+                messages=sorted_msgs,
             )
         )
 
