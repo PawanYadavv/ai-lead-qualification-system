@@ -2,10 +2,10 @@
 from app.models.lead import Lead
 
 
-HIGH_BUDGET_HINTS = {"high", "enterprise", "10000", "10k", "20000", "20k", "50000", "50k"}
-MEDIUM_BUDGET_HINTS = {"medium", "5000", "5k", "8000", "8k"}
-FAST_TIMELINE_HINTS = {"asap", "immediately", "this month", "2 weeks", "urgent"}
-MID_TIMELINE_HINTS = {"1 month", "2 months", "3 months", "next quarter"}
+HIGH_BUDGET_HINTS = {"high", "enterprise", "10000", "10k", "20000", "20k", "50000", "50k", "100000", "100k", "1cr", "crore", "cr", "million", "1m"}
+MEDIUM_BUDGET_HINTS = {"medium", "5000", "5k", "8000", "8k", "lakh", "lakhs", "lac", "50000"}
+FAST_TIMELINE_HINTS = {"asap", "immediately", "this month", "2 weeks", "urgent", "right away", "this week"}
+MID_TIMELINE_HINTS = {"1 month", "2 months", "3 months", "next quarter", "next month", "next week", "30 days", "60 days", "90 days"}
 
 
 def _score_budget(budget: str | None) -> int:
